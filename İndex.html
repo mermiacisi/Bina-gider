@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Daire Takip Sistemi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; margin: 20px; max-width: 700px; }
+    input, select { margin: 5px; padding: 5px; width: 100%; }
+    button { padding: 10px; margin: 10px 0; width: 100%; }
+    .gizli { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+    .kutu { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Daire Takip Giriş</h2>
+<div id="girisEkrani">
+  <input id="kadi" placeholder="Kullanıcı Adı" />
+  <input id="sifre" placeholder="Şifre" type="password" />
+  <button onclick="giris()">Giriş Yap</button>
+</div>
+
+<div id="anaEkran" class="gizli">
+  <h2>Daire Gider Kayıt</h2>
+  <input id="daireNo" placeholder="Daire No (örneğin 1, 2A, 3)" />
+  <input id="ay" placeholder="Ay (2025-06)" />
+  <input id="kira" type="number" placeholder="Kira" />
+  <input id="elektrik" type="number" placeholder="Elektrik" />
+  <input id="su" type="number" placeholder="Su" />
+  <input id="dogalgaz" type="number" placeholder="Doğalgaz" />
+  <input id="aidat" type="number" placeholder="Aidat" />
+  <input id="diger" type="number" placeholder="Diğer Gider" />
+  <button onclick="kaydet()">Kaydet</button>
+
+  <h3>Kayıtlar</h3>
+  <div id="kayitlar"></div>
+  <button onclick="cikis()">Çıkış Yap</button>
+</div>
+
+<script>
+  const dogruKullanici = "admin";
+  const dogruSifre = "1234";
+
+  function giris() {
+    const k = document.getElementById("kadi").value;
+    const s = document.getElementById("sifre").value;
+    if (k === dogruKullanici && s === dogruSifre) {
+      document.getElementById("girisEkrani").classList.add("gizli");
+      document.getElementById("anaEkran").classList.remove("gizli");
+      listele();
+    } else {
+      alert("Hatalı kullanıcı adı veya şifre!");
+    }
+  }
+
+  function kaydet() {
+    const veri = {
+      daire: document.getElementById("daireNo").value,
+      ay: document.getElementById("ay").value,
+      kira: parseFloat(document.getElementById("kira").value) || 0,
+      elektrik: parseFloat(document.getElementById("elektrik").value) || 0,
+      su: parseFloat(document.getElementById("su").value) || 0,
+      dogalgaz: parseFloat(document.getElementById("dogalgaz").value) || 0,
+      aidat: parseFloat(document.getElementById("aidat").value) || 0,
+      diger: parseFloat(document.getElementById("diger").value) || 0
+    };
+
+    let tumVeriler = JSON.parse(localStorage.getItem("daireVerileri") || "[]");
+    tumVeriler.push(veri);
+    localStorage.setItem("daireVerileri", JSON.stringify(tumVeriler));
+    listele();
+  }
+
+  function listele() {
+    const veri = JSON.parse(localStorage.getItem("daireVerileri") || "[]");
+    let html = "<table><tr><th>Daire</th><th>Ay</th><th>Kira</th><th>Elektrik</th><th>Su</th><th>Doğalgaz</th><th>Aidat</th><th>Diğer</th></tr>";
+    for (const v of veri) {
+      html += `<tr>
+        <td>${v.daire}</td><td>${v.ay}</td><td>${v.kira}</td><td>${v.elektrik}</td><td>${v.su}</td>
+        <td>${v.dogalgaz}</td><td>${v.aidat}</td><td>${v.diger}</td>
+      </tr>`;
+    }
+    html += "</table>";
+    document.getElementById("kayitlar").innerHTML = html;
+  }
+
+  function cikis() {
+    location.reload();
+  }
+</script>
+
+</body>
+</html>
